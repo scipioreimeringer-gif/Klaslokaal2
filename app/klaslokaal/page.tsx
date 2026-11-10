@@ -10,7 +10,7 @@ const STUDENTS='klaslokaal-v16-demo-students';
 type Student={id:string;name:string;subject?:string;canvas?:string};
 type Tool='pen'|'eraser';
 function Workspace(){
- const {user,role}=useAuth();const query=useSearchParams();const studentId=query.get('student')||'';
+ const {user,role}=useAuth();const query=useSearchParams();const studentId=query?.get('student')||'';
  const canvas=useRef<HTMLCanvasElement>(null);const drawing=useRef(false);const last=useRef<{x:number;y:number}|null>(null);const history=useRef<string[]>([]);const restore=useRef('');const saveTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
  const [student,setStudent]=useState<Student|null>(null);const [allowed,setAllowed]=useState(false);const [tool,setTool]=useState<Tool>('pen');const [color,setColor]=useState('#283b83');const [width,setWidth]=useState(3);const [notes,setNotes]=useState('');const [showNotes,setShowNotes]=useState(false);const [pdf,setPdf]=useState<string|null>(null);const [pdfName,setPdfName]=useState('');const [status,setStatus]=useState('Klaar');const [ready,setReady]=useState(false);
  const key=studentId?`klaslokaal-v19-board-${studentId}`:'klaslokaal-v19-board-demo';
