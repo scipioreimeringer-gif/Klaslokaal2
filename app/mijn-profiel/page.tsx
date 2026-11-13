@@ -1,0 +1,9 @@
+ 'use client';
+import {useEffect,useState} from 'react';
+import Nav from '../../components/Nav';
+import {useAuth} from '../../components/Auth';
+import {supabase} from '../../lib/supabase';
+type Student={id:string;name:string;subject:string;goals:string;homework:string;notes:string;history:string};
+export default function MyProfile(){const {user}=useAuth();const [items,setItems]=useState<Student[]>([]);const [error,setError]=useState('');
+useEffect(()=>{if(!user)return;void (async()=>{const {data,error:e}=await supabase()!.from('students').select('id,name,subject,goals,homework,notes,history').eq('user_id',user.id);if(e)setError(e.message);else setItems(data||[])})();},[user?.id]);
+return <Nav><div className="profile-head"><div><p className="muted">MIJN LEEROMGEVING</p><h1>Mijn leerlingprofiel</h1><p className="muted">Mijn doelen, huiswerk en feedback van mijn docent</p></div></div>{error&&<div className="notice">{error}</div>}{!items.length?<section className="card"><h2>Je profiel wordt nog gekoppeld</h2><p>Open de uitnodigingslink van je docent en log in met het e-mailadres waarop je bent uitgenodigd.</p></section>:items.map(s=><section className="card" key={s.id} style={{marginBottom:18}}><h2>{s.name} · {s.subject||'Taalonderwijs'}</h2><div className="profile-columns"><div><h3>Mijn leerdoelen</h3><p style={{whiteSpace:'pre-wrap'}}>{s.goals||'Nog geen leerdoelen'}</p><h3>Huiswerk</h3><p style={{whiteSpace:'pre-wrap'}}>{s.homework||'Nog geen huiswerk'}</p></div><div><h3>Feedback en lesnotities</h3><p style={{whiteSpace:'pre-wrap'}}>{s.notes||'Nog geen feedback'}</p><h3>Eerdere lessen</h3><p style={{whiteSpace:'pre-wrap'}}>{s.history||'Nog geen lesgeschiedenis'}</p></div></div><p className="muted">Voortgangsgrafieken en AI-analyses volgen later. AI-concepten worden niet getoond.</p></section>)}</Nav>}

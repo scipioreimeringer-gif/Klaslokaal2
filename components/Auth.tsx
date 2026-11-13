@@ -12,4 +12,24 @@ export function AuthProvider({children}:{children:React.ReactNode}){
  useEffect(()=>{void load();const db=supabase();const {data}=db?.auth.onAuthStateChange(()=>{setTimeout(()=>{void load()},0)})||{};return()=>data?.subscription.unsubscribe()},[]);
  return <C.Provider value={{user,role,loading,refresh:load}}>{children}</C.Provider>
 }
-export function AuthGate({children}:{children:React.ReactNode}){const {user,loading}=useAuth();const db=supabase();if(!db)return <div className="auth-wrap"><section className="auth-card"><h1>Configuratie ontbreekt</h1><p>Voeg NEXT_PUBLIC_SUPABASE_URL en NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY toe in Vercel en deploy opnieuw.</p></section></div>;if(loading)return <div className="auth-wrap">Account laden…</div>;if(!user)return <div className="auth-wrap"><section className="auth-card"><div className="auth-logo">✦ Klaslokaal 2.0</div><h1>Welkom bij Klaslokaal</h1><p>Log in met Google om je persoonlijke onderwijsruimte te openen.</p><button className="button auth-google" onClick={async()=>{const {error}=await db.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.origin}});if(error)alert(error.message)}}>Inloggen met Google</button><small>Je krijgt standaard een leerlingaccount. Een docentaccount wordt apart geactiveerd.</small></section></div>;return <>{children}</>}
+export function AuthGate({children}:{children:React.ReactNode}){
+ const {user,loading}=useAuth();
+ const [email,setEmail]=useState('');
+ const [message,setMessage]=useState('');
+ const [busy,setBusy]=useState(false);
+ const db=supabase();
+ if(!db)return <div className="auth-wrap"><section className="auth-card"><h1>Configuratie ontbreekt</h1><p>Controleer de Supabase-omgevingsvariabelen in Vercel.</p></section></div>;
+ if(loading)return <div className="auth-wrap">Account laden…</div>;
+ if(!user)return <div className="auth-wrap"><section className="auth-card" style={{maxWidth:440}}>
+ <div className="auth-logo">✦ Klaslokaal 2.0</div><h1>Welkom bij Klaslokaal</h1>
+ <p>Log in om je eigen leeromgeving te openen. Heb je een uitnodigingslink? Gebruik hetzelfde e-mailadres als waarop je bent uitgenodigd.</p>
+ <button className="button auth-google" disabled={busy} onClick={async()=>{setBusy(true);const {error}=await db.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.href}});if(error){setMessage(error.message);setBusy(false)}}}>Doorgaan met Google</button>
+ <p style={{margin:'20px 0 8px'}}>Of ontvang een veilige inloglink per e-mail</p>
+ <form onSubmit={async e=>{e.preventDefault();setBusy(true);setMessage('');const {error}=await db.auth.signInWithOtp({email:email.trim().toLowerCase(),options:{emailRedirectTo:window.location.href,shouldCreateUser:true}});setBusy(false);setMessage(error?error.message:'Controleer je e-mail en klik op de inloglink.');}}>
+ <input className="field" type="email" required value={email} onChange={e=>setEmail(e.target.value)} placeholder="jij@voorbeeld.com" style={{width:'100%',marginBottom:10}}/>
+ <button className="button" disabled={busy} type="submit" style={{width:'100%'}}>Stuur mij een inloglink</button>
+ </form>{message&&<p role="status" style={{marginTop:12}}>{message}</p>}
+ <small>Je sessie wordt op dit webadres onthouden. Gebruik geen gedeelde computer als je ingelogd wilt blijven.</small>
+ </section></div>;
+ return <>{children}</>;
+}
