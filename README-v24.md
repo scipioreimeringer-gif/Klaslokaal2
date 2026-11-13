@@ -1,0 +1,1 @@
+v24 navigatiefix: Dashboard, zijmenu, leerlingprofiel Start les en oude /klaslokaal-route verwijzen nu naar /klaslokaal/live. Bestaande v16 iframe blijft ongewijzigd. Let op: live-route is nog alleen voor docenten/beheerders; leerlingaccounts en Supabase-profielen zijn nog niet gekoppeld aan de v16-lesruimte. Geen SQL-wijzigingen nodig.
