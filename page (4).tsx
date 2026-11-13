@@ -1,0 +1,1 @@
+import Nav from '../../components/Nav';export default function Agenda(){return <Nav><h1>Lesagenda</h1><div className="card"><h3>Agenda in ontwikkeling</h3><p className="muted">Hier komen geplande lessen, herinneringen en een kalender. Er worden nog geen afspraken opgeslagen.</p></div></Nav>}
